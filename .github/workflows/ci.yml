@@ -1,7 +1,7 @@
 # CI workflow for pyiikocloudapi
 #
 # Badge (add to README.md):
-#   ![CI](https://github.com/kebrick/pyiikocloupapi/actions/workflows/ci.yml/badge.svg)
+#   ![CI](https://github.com/apahomov/pyiikocloudapi/actions/workflows/ci.yml/badge.svg)
 
 name: CI
 
@@ -22,7 +22,9 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Set up Python
-        run: uv python install 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install dependencies
         run: uv pip install --system ruff
@@ -46,7 +48,9 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: uv pip install --system httpx pydantic pytest pytest-asyncio
