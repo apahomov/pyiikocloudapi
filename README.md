@@ -1,64 +1,132 @@
-# pyiikocloudapi - python iiko Cloud API сервис
+# pyiikocloudapi - python iiko Cloud API
 
-![](https://www.python.org/static/img/python-logo.png) 
+![](https://www.python.org/static/img/python-logo.png)
 
 ## Другие реализации
 
 Также доступны реализации для других языков программирования:
 
-Go: [goiikoapi](https://github.com/kebrick/goiikoapi) — реализация iiko Cloud API на языке Go
+Go: [goiikoapi](https://github.com/kebrick/goiikoapi) -- реализация iiko Cloud API на языке Go
 
 Установка
 ============
 
 Пользуем pip:
-    
+
 ```
 pip install pyiikocloudapi
 ```
 
 Зависимости
 
-    requests
-    pydantic
+    httpx>=0.24.0
+    pydantic>=2.0
 
-Начиная с версии _0.0.20_
+Архитектура
+============
 
-    requests
-    pydantic>=2.9.2
-    
+Начиная с версии 0.0.30 проект использует модульную архитектуру:
+
+```
+pyiikocloudapi/
+    __init__.py          # Экспорт IikoTransport, AsyncIikoTransport, моделей
+    base.py              # BaseAPI -- базовый синхронный клиент (httpx.Client)
+    async_api.py         # AsyncBaseAPI + AsyncIikoTransport -- асинхронный клиент (httpx.AsyncClient)
+    api.py               # IikoTransport -- синхронный клиент (собирает mixin-ы)
+    _http.py             # Общая логика обработки ответов (process_response)
+    models.py            # Pydantic-модели данных
+    exception.py         # Иерархия исключений
+    decorators.py        # Декораторы (@experimental и др.)
+    mixins/              # Модули по доменным областям API:
+        webhook.py       #   WebHook
+        commands.py      #   Commands
+        dictionaries.py  #   Dictionaries
+        menu.py          #   Menu
+        orders.py        #   Orders
+        deliveries.py    #   Deliveries
+        employees.py     #   Employees
+        customers.py     #   Customers
+        notifications.py #   Notifications
+        address.py       #   Address
+        ...
+```
+
+Синхронный `IikoTransport` собирается из mixin-классов в `mixins/`, а асинхронный `AsyncIikoTransport` определён целиком в `async_api.py`. Оба используют общую логику обработки ответов из `_http.py`.
+
 Как использовать
 ============
 Все названия методов соответствуют названию в ссылке (смотрите документацию iiko Transport).
 
 
-**Пример названия метода:** 
+**Пример названия метода:**
 
 - _/api/1/auth/        - `access_token`_
 - _/api/1/order/create - `order_create`_
 
 
 
-Если вам нужно чтобы ответ был в dict - то либо 
-    
+Если вам нужно чтобы ответ был в dict - то либо
+
     api = IikoTransport(api_login, return_dict=True)
 
     # Либо
     api.return_dict = True
 
-Example
+Синхронный пример
 ============
-    from pyiikocloudapi import IikoTransport
-    from pyiikocloudapi.models import CouriersModel
+```python
+from pyiikocloudapi import IikoTransport
+from pyiikocloudapi.models import CouriersModel
 
-    # инициализация класса 
-    api = IikoTransport(api_login)
+# инициализация класса
+api = IikoTransport(api_login)
 
-    # получаем организации получить из можно api.organizations_ids: dict or api.organizations_ids_models: OrganizationsModel
+# получаем организации
+api.organizations()
+# api.organizations_ids: list[str]
+# api.organizations_ids_models: list[OrganizationModel]
+
+# получаю список курьеров организации
+couriers: CouriersModel = api.couriers(api.organizations_ids)
+```
+
+Использование с контекстным менеджером (рекомендуется):
+```python
+from pyiikocloudapi import IikoTransport
+
+with IikoTransport(api_login) as api:
     api.organizations()
+    couriers = api.couriers(api.organizations_ids)
+# httpx.Client автоматически закрывается при выходе из with
+```
 
-    # получаю список курьеров организации
-    couriers: CouriersModel = api.couriers(api.organizations_ids)
+Асинхронный пример
+============
+```python
+import asyncio
+from pyiikocloudapi import AsyncIikoTransport
+
+async def main():
+    async with AsyncIikoTransport(api_login) as api:
+        await api.organizations()
+        couriers = await api.couriers(api.organizations_ids)
+        print(couriers)
+
+asyncio.run(main())
+```
+
+Можно также использовать без контекстного менеджера:
+```python
+from pyiikocloudapi import AsyncIikoTransport
+
+api = AsyncIikoTransport(api_login)
+await api.organizations()
+couriers = await api.couriers(api.organizations_ids)
+# Не забудьте закрыть клиент
+await api.close()
+```
+
+Синхронный и асинхронный API имеют одинаковый набор методов. Все методы асинхронного клиента -- это `async`-версии синхронных методов.
 
 Пример валидации WebHook событий
 ============
@@ -86,11 +154,11 @@ Example
 
     # Валидация данных WebHook
     webhook_event = WebHookDeliveryOrderEventInfoModel.model_validate(data)
-    
+
     # Доступ к данным после валидации
     print(webhook_event.event_type)  # "DeliveryOrderUpdate"
     print(webhook_event.organization_id)  # "7bc05553-4b68-44e8-b7bc-37be63c6d9e9"
-    
+
     # В зависимости от event_type, event_info будет разного типа:
     # - DeliveryOrderUpdate -> EventInfo
     # - StopListUpdate -> EventInfoStopList
@@ -109,7 +177,7 @@ iiko Transport(iiko Cloud API) по словам _**разработчиков**
 `sourceKey` это "Источник заказа" из настроек в iikoWeb
 
 
-### Реализованные методы iiko Transport(iiko Cloud API) 
+### Реализованные методы iiko Transport(iiko Cloud API)
 - Authorization
   - [x] [Retrieve session key for API user.](https://api-ru.iiko.services/#tag/Authorization/paths/~1api~11~1access_token/post)
 - Notifications
