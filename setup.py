@@ -9,7 +9,7 @@ setup(
     description='Python services for convenient work with iiko Transport / iiko cloud api',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=['pyiikocloudapi', 'pyiikocloudapi.mixins'],
+    packages=['pyiikocloudapi', 'pyiikocloudapi.mixins', 'pyiikocloudapi.async_mixins'],
     # packages=find_packages(where="src"),
     # package_dir={"": "src"},
     author='kebrick',
@@ -21,6 +21,6 @@ setup(
     },
     install_requires=['httpx>=0.24.0', 'pydantic>=2.0'],
 
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     zip_safe=False
 )

@@ -33,7 +33,7 @@ class TestImports:
         assert BaseAPI is not None
 
     def test_import_async_base_api(self):
-        from pyiikocloudapi.async_api import AsyncBaseAPI
+        from pyiikocloudapi import AsyncBaseAPI
         assert AsyncBaseAPI is not None
 
     def test_import_models(self):
@@ -141,15 +141,6 @@ class TestMethodParity:
             'parse_webhook_order', 'parse_webhook_reserve',  # static
             'check_status_code_token',  # sync utility
         }
-        # experimental-decorated methods appear as non-coroutine due to wrapper
-        experimental_methods = {
-            'by_revision', 'by_delivery_date_and_phone',
-            'employees_couriers_locations_by_time_offset',
-            'employees_couriers_by_role',
-            'employees_couriers_active_location_by_terminal',
-            'employees_couriers_active_location',
-        }
-        non_coroutine_allowed.update(experimental_methods)
 
         for name, method in inspect.getmembers(AsyncIikoTransport, predicate=inspect.isfunction):
             if name.startswith('_'):
@@ -247,7 +238,7 @@ class TestNoRequestsReferences:
     def _get_python_sources(self):
         import pathlib
         pkg_dir = pathlib.Path(__file__).parent.parent / 'pyiikocloudapi'
-        return list(pkg_dir.glob('*.py'))
+        return list(pkg_dir.rglob('*.py'))
 
     def test_no_import_requests(self):
         for path in self._get_python_sources():

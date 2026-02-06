@@ -8,25 +8,19 @@ import httpx
 
 from pyiikocloudapi._http import process_response
 from pyiikocloudapi.exception import CheckTimeToken, SetSession, TokenException
-from pyiikocloudapi.models import (
-    BaseOrganizationsModel,
-    CustomErrorModel,
-    OrganizationModel,
-)
+from pyiikocloudapi.models import *
 
 
-class BaseAPI:
+class AsyncBaseAPI:
     DEFAULT_TIMEOUT = "15"
 
-    # __BASE_URL = "https://api-ru.iiko.services"
-
-    def __init__(self, api_login: str, session: Optional[httpx.Client] = None, debug: bool = False,
+    def __init__(self, api_login: str, session: Optional[httpx.AsyncClient] = None, debug: bool = False,
                  base_url: str = None, working_token: str = None, base_headers: dict = None, logger: Optional[
             logging.Logger] = None, return_dict: bool = False, *args, **kwargs):
         """
 
         :param api_login: login api iiko cloud
-        :param session: session object
+        :param session: session object (httpx.AsyncClient)
         :param debug: logging dict response
         :param base_url: url iiko cloud api
         :param working_token: Initialize an object based on a working token, that is, without requesting a new one
@@ -38,7 +32,7 @@ class BaseAPI:
         if session is not None:
             self.__session = session
         else:
-            self.__session = httpx.Client()
+            self.__session = httpx.AsyncClient()
 
         self.__api_login = api_login
         self.__token: Optional[str] = None
@@ -55,12 +49,19 @@ class BaseAPI:
             "Content-Type": "application/json",
             "Timeout": "45",
         } if base_headers is None else base_headers
-        self.__set_token(working_token) if working_token is not None else self.__get_access_token()
-        # if working_token is not None:
-        #     self.__set_token(working_token)
-        # else:
-        #     self.__get_access_token()
+
+        self.__token_initialized = False
+        if working_token is not None:
+            self.__set_token(working_token)
+            self.__token_initialized = True
+
         self.__last_data = None
+
+    async def ensure_token(self):
+        """Lazy token initialization. Call before first request."""
+        if not self.__token_initialized:
+            await self._async_get_access_token()
+            self.__token_initialized = True
 
     def check_status_code_token(self, code: Union[str, int]):
         # NOTE: This method is intentionally a no-op. Kept for backward compatibility.
@@ -74,7 +75,7 @@ class BaseAPI:
         elif str(code) == "500":
             pass
 
-    def check_token_time(self) -> bool:
+    async def check_token_time(self) -> bool:
         """
         Проверка на время жизни маркера доступа
         :return: Если прошло 15 мин будет запрошен токен и метод вернёт True, иначе вернётся False
@@ -82,9 +83,8 @@ class BaseAPI:
         fifteen_minutes_ago = datetime.now() - timedelta(minutes=15)
         time_token = self.__time_token
         try:
-
             if time_token <= fifteen_minutes_ago:
-                self.__get_access_token()
+                await self._async_get_access_token()
                 return True
             else:
                 return False
@@ -107,18 +107,18 @@ class BaseAPI:
         return self.__last_data
 
     @property
-    def session_s(self) -> httpx.Client:
+    def session_s(self) -> httpx.AsyncClient:
         """Вывести сессию"""
         return self.__session
 
     @session_s.setter
-    def session_s(self, session: httpx.Client = None):
+    def session_s(self, session: httpx.AsyncClient = None):
         """Изменение сессии"""
         if session is None:
             raise SetSession(
                 self.__class__.__qualname__,
                 self.session_s.__name__,
-                f"Не присвоен объект типа httpx.Client")
+                f"Не присвоен объект типа httpx.AsyncClient")
         else:
             self.__session = session
 
@@ -183,13 +183,13 @@ class BaseAPI:
         self.__headers["Authorization"] = f"Bearer {self.token}"
         self.__time_token = datetime.now()
 
-    def access_token(self):
+    async def access_token(self):
         """Получить маркер доступа"""
         data = json.dumps({"apiLogin": self.api_login})
         try:
-            result = self.session_s.post(f'{self.__base_url}/api/1/access_token', content=data,
-                                          headers={"Content-Type": "application/json"},
-                                          timeout=float(self.DEFAULT_TIMEOUT))
+            result = await self.session_s.post(f'{self.__base_url}/api/1/access_token', content=data,
+                                               headers={"Content-Type": "application/json"},
+                                               timeout=float(self.DEFAULT_TIMEOUT))
 
             response_data: dict = json.loads(result.content)
             if response_data.get("errorDescription", None) is not None:
@@ -211,8 +211,9 @@ class BaseAPI:
                                  self.access_token.__name__,
                                  f"Не удалось получить маркер доступа: \n{err}")
 
-    def _post_request(self, url: str, data: dict = None, timeout=DEFAULT_TIMEOUT, model_response_data=None,
-                      model_error=CustomErrorModel):
+    async def _post_request(self, url: str, data: dict = None, timeout=DEFAULT_TIMEOUT, model_response_data=None,
+                            model_error=CustomErrorModel):
+        await self.ensure_token()
         if data is None:
             data = {}
         if timeout != self.DEFAULT_TIMEOUT:
@@ -221,15 +222,14 @@ class BaseAPI:
 
         try:
             for attempt in range(2):
-                response = self.session_s.post(f'{self.base_url}{url}', content=json.dumps(data),
-                                               headers=self.headers, timeout=float(timeout))
+                response = await self.session_s.post(f'{self.base_url}{url}', content=json.dumps(data),
+                                                     headers=self.headers, timeout=float(timeout))
                 if response.status_code == 401 and attempt == 0:
-                    self.__get_access_token()
+                    await self._async_get_access_token()
                     continue
 
                 if self.__debug:
                     try:
-
                         self.logger.debug(
                             f"Входные данные:\n{response.request.url=}\n{response.request.content=}\n{response.request.headers=}\n\nВыходные данные:\n{response.headers=}\n{response.content=}\n\n")
                     except Exception as err:
@@ -248,8 +248,8 @@ class BaseAPI:
             if timeout != self.DEFAULT_TIMEOUT:
                 del self.timeout
 
-    def __get_access_token(self):
-        out = self.access_token()
+    async def _async_get_access_token(self):
+        out = await self.access_token()
         if isinstance(out, CustomErrorModel):
             raise TokenException(self.__class__.__qualname__,
                                  self.access_token.__name__,
@@ -258,8 +258,8 @@ class BaseAPI:
     def __convert_org_data(self, data: BaseOrganizationsModel):
         self.__organizations_ids = data.__list_id__()
 
-    def organizations(self, organization_ids: List[str] = None, return_additional_info: bool = None,
-                      include_disabled: bool = None, timeout=DEFAULT_TIMEOUT) -> Union[
+    async def organizations(self, organization_ids: List[str] = None, return_additional_info: bool = None,
+                            include_disabled: bool = None, timeout=DEFAULT_TIMEOUT) -> Union[
         CustomErrorModel, BaseOrganizationsModel]:
         """
         Возвращает организации, доступные пользователю API-login.
@@ -268,7 +268,6 @@ class BaseAPI:
         :param include_disabled: Attribute that shows that response contains disabled organizations.
         :return:
         """
-        #         https://api-ru.iiko.services/api/1/organizations
         data = {}
         if organization_ids is not None:
             data["organizationIds"] = organization_ids
@@ -277,8 +276,7 @@ class BaseAPI:
         if include_disabled is not None:
             data["includeDisabled"] = include_disabled
         try:
-
-            response_data = self._post_request(
+            response_data = await self._post_request(
                 url="/api/1/organizations",
                 data=data,
                 model_response_data=BaseOrganizationsModel,
@@ -290,7 +288,6 @@ class BaseAPI:
                 self.__organizations_ids = [org.get('id') for org in response_data.get("organizations", [])]
             return response_data
 
-
         except httpx.HTTPError as err:
             raise TokenException(self.__class__.__qualname__,
                                  self.organizations.__name__,
@@ -300,13 +297,11 @@ class BaseAPI:
                             self.organizations.__name__,
                             f"Не удалось получить организации: \n{err}")
 
-    def close(self):
-        """Close the underlying httpx.Client."""
-        self.__session.close()
+    async def close(self):
+        await self.session_s.aclose()
 
-    def __enter__(self):
+    async def __aenter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-        return False
+    async def __aexit__(self, *args):
+        await self.close()
