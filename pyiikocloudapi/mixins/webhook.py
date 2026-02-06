@@ -11,4 +11,4 @@ class WebHook(BaseAPI):
 
     @staticmethod
     def parse_webhook_reserve(data: List[dict]) -> List[WebHookDeliveryOrderEventInfoModel]:
-        raise NotImplementedError('parse_webhook_reserve is not yet implemented')
+        raise NotImplementedError("parse_webhook_reserve is not yet implemented")

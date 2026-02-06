@@ -1,6 +1,7 @@
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Optional, List, Union, Any
+from typing import Any, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -14,12 +15,11 @@ class IdNameModel(BaseModel):
 
 
 class BaseResponseModel(BaseModel):
-    correlation_id: Optional[str] = Field(None, alias='correlationId')
-
+    correlation_id: Optional[str] = Field(None, alias="correlationId")
 
 
 class ErrorModel(BaseResponseModel):
-    error_description: Optional[str] = Field(None, alias='errorDescription')
+    error_description: Optional[str] = Field(None, alias="errorDescription")
     error: Optional[str] = None
 
 
@@ -66,7 +66,9 @@ class OrganizationModel(IdNameModel):
     default_delivery_city_id: Optional[str] = Field(None, alias="defaultDeliveryCityId")
     delivery_city_ids: Optional[List[str]] = Field(None, alias="deliveryCityIds")
     delivery_service_type: Optional[str] = Field(None, alias="deliveryServiceType")
-    delivery_order_payment_settings: Optional[DeliveryOrderPaymentSettingsEnum] = Field(None, alias="deliveryOrderPaymentSettings")
+    delivery_order_payment_settings: Optional[DeliveryOrderPaymentSettingsEnum] = Field(
+        None, alias="deliveryOrderPaymentSettings"
+    )
     default_call_center_payment_type_id: Optional[str] = Field(None, alias="defaultCallCenterPaymentTypeId")
     order_item_comment_enabled: Optional[bool] = Field(None, alias="orderItemCommentEnabled")
     inn: Optional[str] = None
@@ -129,23 +131,26 @@ class BaseOrganizationsModel(BaseResponseModel):
 
 class EmployeeItemModel(BaseModel):
     id: str
-    first_name: Optional[str] = Field(None, alias='firstName')
-    middle_name: Optional[str] = Field(None, alias='middleName')
-    last_name: Optional[str] = Field(None, alias='lastName')
-    display_name: str = Field(alias='displayName')
+    first_name: Optional[str] = Field(None, alias="firstName")
+    middle_name: Optional[str] = Field(None, alias="middleName")
+    last_name: Optional[str] = Field(None, alias="lastName")
+    display_name: str = Field(alias="displayName")
     code: str
-    is_deleted: bool = Field(alias='isDeleted')
+    is_deleted: bool = Field(alias="isDeleted")
 
 
 class EmployeesModel(BaseModel):
-    organization_id: str = Field(alias='organizationId')
+    organization_id: str = Field(alias="organizationId")
     items: Optional[List[EmployeeItemModel]] = None
 
+
 class EmployeeTerminalModel(BaseModel):
-    terminal_group_ids: List[str] = Field(alias='terminalGroupIds')
+    terminal_group_ids: List[str] = Field(alias="terminalGroupIds")
+
 
 class EmployeeIsOpenModel(ErrorModel):
-   is_session_Opened: Optional[bool] = Field(None, alias='isSessionOpened')
+    is_session_Opened: Optional[bool] = Field(None, alias="isSessionOpened")
+
 
 class CouriersModel(BaseResponseModel):
     employees: List[EmployeesModel]
@@ -380,15 +385,17 @@ class ErrorInfoModel(BaseModel):
 
 class ByOrderItemModel(BaseModel):
     id: str
-    external_number: Optional[str] = Field(None, alias='externalNumber')
-    organization_id: str = Field(alias='organizationId')
+    external_number: Optional[str] = Field(None, alias="externalNumber")
+    organization_id: str = Field(alias="organizationId")
     timestamp: int
-    creation_status: Optional[str] = Field(None, alias='creationStatus')
-    error_info: Optional[ErrorInfoModel] = Field(None, alias='errorInfo')
+    creation_status: Optional[str] = Field(None, alias="creationStatus")
+    error_info: Optional[ErrorInfoModel] = Field(None, alias="errorInfo")
     order: Optional[CreatedDeliveryOrderModel] = None
 
     def get_by_courier_id(self, courier_id: str):
-        return self if self.order.courier_info is not None and self.order.courier_info.courier.id == courier_id else None
+        return (
+            self if self.order.courier_info is not None and self.order.courier_info.courier.id == courier_id else None
+        )
 
 
 class ByIdModel(BaseResponseModel):
@@ -396,16 +403,20 @@ class ByIdModel(BaseResponseModel):
 
 
 class OrdersByOrganizationsModel(BaseModel):
-    organization_id: str = Field(alias='organizationId')
+    organization_id: str = Field(alias="organizationId")
     orders: Optional[List[ByOrderItemModel]] = None
 
     def get_by_courier_name(self, courier_name: str):
-        return next(i for i in self.orders if
-                    i.order.courier_info is not None and str(i.order.courier_info.courier.name) == courier_name)
+        return next(
+            i
+            for i in self.orders
+            if i.order.courier_info is not None and str(i.order.courier_info.courier.name) == courier_name
+        )
 
     def get_by_courier_id(self, courier_id: str):
-        return next(i for i in self.orders if
-                    i.order.courier_info is not None and i.order.courier_info.courier.id == courier_id)
+        return next(
+            i for i in self.orders if i.order.courier_info is not None and i.order.courier_info.courier.id == courier_id
+        )
 
     # def get_by_courier_id_v2(self, courier_id: str):
     #     for i in self.orders:
@@ -427,11 +438,11 @@ class RegionsItemModel(BaseModel):
     id: str
     name: str
     external_revision: Optional[int] = Field(None, alias="externalRevision")
-    is_deleted: bool = Field(alias='isDeleted')
+    is_deleted: bool = Field(alias="isDeleted")
 
 
 class RegionsModel(BaseModel):
-    organization_id: str = Field(alias='organizationId')
+    organization_id: str = Field(alias="organizationId")
     items: Optional[List[RegionsItemModel]] = None
 
 
@@ -443,13 +454,13 @@ class CitiesItemModel(BaseModel):
     id: str
     name: str
     external_revision: Optional[int] = Field(None, alias="externalRevision")
-    is_deleted: bool = Field(alias='isDeleted')
+    is_deleted: bool = Field(alias="isDeleted")
     classifier_id: Optional[str] = Field(None, alias="classifierId")
     additional_info: Optional[str] = Field(None, alias="additionalInfo")
 
 
 class CitiesModel(BaseModel):
-    organization_id: str = Field(alias='organizationId')
+    organization_id: str = Field(alias="organizationId")
     items: Optional[List[CitiesItemModel]] = None
 
 
@@ -462,7 +473,7 @@ class StreetsItemModel(BaseModel):
     name: str
     external_revision: Optional[int] = Field(None, alias="externalRevision")
     classifier_id: Optional[str] = Field(None, alias="classifierId")
-    is_deleted: bool = Field(alias='isDeleted')
+    is_deleted: bool = Field(alias="isDeleted")
 
 
 # class StreetsModel(BaseModel):
@@ -482,7 +493,7 @@ class TerminalGroupItemModel(BaseModel):
 
 
 class TerminalGroupsModel(BaseModel):
-    organization_id: str = Field(alias='organizationId')
+    organization_id: str = Field(alias="organizationId")
     items: Optional[List[TerminalGroupItemModel]] = None
 
 
@@ -493,7 +504,7 @@ class BaseTerminalGroupsModel(BaseResponseModel):
 class TGIsAliveItemModel(BaseModel):
     isAlive: bool = Field(alias="isAlive")
     terminal_group_id: str = Field(alias="terminalGroupId")
-    organization_id: str = Field(alias='organizationId')
+    organization_id: str = Field(alias="organizationId")
 
 
 class BaseTGIsAliveyModel(BaseResponseModel):
@@ -635,10 +646,10 @@ class COICreationStatusModel(str, Enum):
 
 class CreatedOrderInfoModel(BaseModel):
     id: str
-    external_number: Optional[str] = Field(None, alias='externalNumber')
-    organization_id: str = Field(alias='organizationId')
+    external_number: Optional[str] = Field(None, alias="externalNumber")
+    organization_id: str = Field(alias="organizationId")
     timestamp: int
-    creation_status: Optional[COICreationStatusModel] = Field(None, alias='creationStatus')
+    creation_status: Optional[COICreationStatusModel] = Field(None, alias="creationStatus")
     error_info: Optional[ErrorInfoModel] = Field(None, alias="errorInfo")
     order: CreateOrderDetailModel
 
@@ -674,6 +685,7 @@ class NomenclatureGroupModel(BaseModel):
     seoKeywords	- SEO key words.
     seoTitle - SEO header.
     """
+
     image_links: List[str] = Field(alias="imageLinks")
     parent_group: Optional[str] = Field(None, alias="parentGroup")
     order: int
@@ -736,7 +748,7 @@ class NPModifierModel(BaseModel):
     min_amount: int = Field(alias="minAmount")
     max_amount: int = Field(alias="maxAmount")
     required: Optional[bool] = None
-    hide_if_default_amount: Optional[bool] = Field(None, alias='hideIfDefaultAmount')
+    hide_if_default_amount: Optional[bool] = Field(None, alias="hideIfDefaultAmount")
     splittable: Optional[bool] = None
     free_of_charge_amount: Optional[int] = Field(None, alias="freeOfChargeAmount")
 
@@ -749,10 +761,11 @@ class NPGroupModifierModel(BaseModel):
     min_amount: int = Field(alias="minAmount")
     max_amount: int = Field(alias="maxAmount")
     required: bool
-    child_modifiers_have_min_max_restrictions: Optional[bool] = Field(None,
-                                                                      alias='childModifiersHaveMinMaxRestrictions')
-    child_modifiers: List[NPModifierModel] = Field(alias='childModifiers')
-    hide_if_default_amount: Optional[bool] = Field(None, alias='hideIfDefaultAmount')
+    child_modifiers_have_min_max_restrictions: Optional[bool] = Field(
+        None, alias="childModifiersHaveMinMaxRestrictions"
+    )
+    child_modifiers: List[NPModifierModel] = Field(alias="childModifiers")
+    hide_if_default_amount: Optional[bool] = Field(None, alias="hideIfDefaultAmount")
     default_amount: Optional[int] = Field(None, alias="defaultAmount")
     splittable: Optional[bool] = None
     free_of_charge_amount: Optional[int] = Field(None, alias="freeOfChargeAmount")
@@ -781,19 +794,19 @@ class NProductModel(BaseModel):
     measure_unit: str = Field(alias="measureUnit")
     size_prices: List[NPSizePriceModel] = Field(alias="sizePrices")
     modifiers: List[NPModifierModel]
-    group_modifiers: List[Optional[NPGroupModifierModel]] = Field(alias='groupModifiers')
+    group_modifiers: List[Optional[NPGroupModifierModel]] = Field(alias="groupModifiers")
     image_links: List[str] = Field(alias="imageLinks")
-    do_not_print_in_cheque: bool = Field(alias='doNotPrintInCheque')
-    parent_group: Optional[str] = Field(None, alias='parentGroup')
+    do_not_print_in_cheque: bool = Field(alias="doNotPrintInCheque")
+    parent_group: Optional[str] = Field(None, alias="parentGroup")
     order: int
-    full_name_english: Optional[str] = Field(None, alias='fullNameEnglish')
-    use_balance_for_sell: bool = Field(alias='useBalanceForSell')
+    full_name_english: Optional[str] = Field(None, alias="fullNameEnglish")
+    use_balance_for_sell: bool = Field(alias="useBalanceForSell")
     can_set_open_price: bool = Field(alias="canSetOpenPrice")
     id: str
     code: Optional[str] = None
     name: str
     description: Optional[str] = None
-    additional_info: Optional[str] = Field(None, alias='additionalInfo')
+    additional_info: Optional[str] = Field(None, alias="additionalInfo")
     tags: Optional[List[str]] = None
     is_deleted: Optional[bool] = Field(None, alias="isDeleted")
     seo_description: Optional[str] = Field(None, alias="seoDescription")
@@ -830,7 +843,7 @@ class MBIdICTaxCategoryModel(IdNameModel):
 
 
 class MBIdICISPriceModel(BaseModel):
-    organization_id: str = Field(alias='organizationId')
+    organization_id: str = Field(alias="organizationId")
     price: float
 
 
@@ -846,13 +859,13 @@ class MBIdICISIMGItemModel(BaseModel):
     sku: str
     name: str
     description: str
-    button_image: str = Field(alias='buttonImage')
+    button_image: str = Field(alias="buttonImage")
     restrictions: MBIdICISIMGRestrictionModel
-    allergen_groups: List[ICIAllergenGroupModel] = Field(alias='allergenGroups')
-    nutrition_per_hundred_grams: dict = Field(alias='nutritionPerHundredGrams')
-    portion_weight_grams: float = Field(alias='portionWeightGrams')
+    allergen_groups: List[ICIAllergenGroupModel] = Field(alias="allergenGroups")
+    nutrition_per_hundred_grams: dict = Field(alias="nutritionPerHundredGrams")
+    portion_weight_grams: float = Field(alias="portionWeightGrams")
     tags: List[IdNameModel]
-    item_id: str = Field(alias='itemId')
+    item_id: str = Field(alias="itemId")
 
 
 class MBIdICISItemModifierGroupModel(BaseModel):
@@ -860,22 +873,22 @@ class MBIdICISItemModifierGroupModel(BaseModel):
     name: str
     description: str
     restrictions: MBIdICISIMGRestrictionModel
-    can_be_divided: bool = Field(alias='canBeDivided')
-    item_group_id: str = Field(alias='itemGroupId')
+    can_be_divided: bool = Field(alias="canBeDivided")
+    item_group_id: str = Field(alias="itemGroupId")
     child_modifiers_have_min_max_restrictions: bool = Field(alias="childModifiersHaveMinMaxRestrictions")
     sku: str
 
 
 class MBIdICItemSizeModel(BaseModel):
     prices: MBIdICISPriceModel
-    item_modifier_groups: List[MBIdICISItemModifierGroupModel] = Field(alias='itemModifierGroups')
+    item_modifier_groups: List[MBIdICISItemModifierGroupModel] = Field(alias="itemModifierGroups")
     sku: str
-    size_code: str = Field(alias='sizeCode')
-    size_name: str = Field(aliad='sizeName')
+    size_code: str = Field(alias="sizeCode")
+    size_name: str = Field(aliad="sizeName")
     is_default: Optional[bool] = Field(None, alias="isDefault")
-    portion_weight_grams: float = Field(alias='portionWeightGrams')
-    size_id: str = Field(alias='sizeId')
-    nutrition_per_hundred_grams: dict = Field(alias='nutritionPerHundredGrams')
+    portion_weight_grams: float = Field(alias="portionWeightGrams")
+    size_id: str = Field(alias="sizeId")
+    nutrition_per_hundred_grams: dict = Field(alias="nutritionPerHundredGrams")
     button_image_url: str = Field(alias="buttonImageUrl")
     button_image_cropped_url: str = Field(alias="buttonImageCroppedUrl")
 
@@ -884,9 +897,9 @@ class MBIdICItemModel(BaseModel):
     sku: str
     name: str
     description: str
-    allergen_groups: List[ICIAllergenGroupModel] = Field(alias='allergenGroups')
-    item_id: str = Field(alias='itemId')
-    modofier_schema_id: str = Field(alias='modofierSchemaId')
+    allergen_groups: List[ICIAllergenGroupModel] = Field(alias="allergenGroups")
+    item_id: str = Field(alias="itemId")
+    modofier_schema_id: str = Field(alias="modofierSchemaId")
     tax_category: MBIdICTaxCategoryModel
     order_item_type: str
     item_sizes: List[MBIdICItemSizeModel]
@@ -909,17 +922,17 @@ class BaseMenuByIdModel(IdNameModel):
 
 # Cancel Causes
 class CCItemModel(IdNameModel):
-    is_deleted: bool = Field(alias='isDeleted')
+    is_deleted: bool = Field(alias="isDeleted")
 
 
 class BaseCancelCausesModel(BaseResponseModel):
-    cancel_causes: List[CCItemModel] = Field(alias='cancelCauses')
+    cancel_causes: List[CCItemModel] = Field(alias="cancelCauses")
 
 
 # OrderTypes
 class ORTItemModel(IdNameModel):
-    order_service_type: str = Field(alias='orderServiceType')
-    is_deleted: bool = Field(alias='isDeleted')
+    order_service_type: str = Field(alias="orderServiceType")
+    is_deleted: bool = Field(alias="isDeleted")
     external_revision: Optional[int] = Field(None, alias="externalRevision")
 
 
@@ -929,30 +942,30 @@ class OrderTypeModel(BaseModel):
 
 
 class BaseOrderTypesModel(BaseResponseModel):
-    order_types: List[OrderTypeModel] = Field(alias='orderTypes')
+    order_types: List[OrderTypeModel] = Field(alias="orderTypes")
 
 
 # Discounts
 class DIProductCategoryDiscountsModel(BaseModel):
     category_id: str = Field(alias="categoryId")
-    category_name: Optional[str] = Field(None, alias='categoryName')
+    category_name: Optional[str] = Field(None, alias="categoryName")
     percent: float
 
 
 class DItemModel(IdNameModel):
     percent: float
-    is_categorised_discount: bool = Field(alias='isCategorisedDiscount')
-    product_category_discounts: List[DIProductCategoryDiscountsModel] = Field(alias='productCategoryDiscounts')
+    is_categorised_discount: bool = Field(alias="isCategorisedDiscount")
+    product_category_discounts: List[DIProductCategoryDiscountsModel] = Field(alias="productCategoryDiscounts")
     comment: Optional[str] = None
-    can_be_applied_selectively: str = Field(alias='canBeAppliedSelectively')
-    min_order_sum: Optional[float] = Field(None, aliad='minOrderSum')
+    can_be_applied_selectively: str = Field(alias="canBeAppliedSelectively")
+    min_order_sum: Optional[float] = Field(None, aliad="minOrderSum")
     mode: str
     sum: float
-    can_apply_by_card_number: bool = Field(alias='canApplyByCardNumber')
-    is_manual: bool = Field(alias='isManual')
-    is_card: bool = Field(alias='isCard')
-    is_automatic: bool = Field(alias='isAutomatic')
-    is_deleted: bool = Field(alias='isDeleted')
+    can_apply_by_card_number: bool = Field(alias="canApplyByCardNumber")
+    is_manual: bool = Field(alias="isManual")
+    is_card: bool = Field(alias="isCard")
+    is_automatic: bool = Field(alias="isAutomatic")
+    is_deleted: bool = Field(alias="isDeleted")
 
 
 class DiscountModel(BaseModel):
@@ -988,15 +1001,15 @@ class PaymentTypeModel(IdNameModel):
     combinable: bool
     external_revision: Optional[int] = Field(None, alias="externalRevision")
     applicable_marketing_campaigns: List[str] = Field(alias="applicableMarketingCampaigns")
-    is_deleted: bool = Field(alias='isDeleted')
-    print_cheque: bool = Field(alias='printCheque')
-    payment_processing_type: Optional[str] = Field(None, alias='paymentProcessingType')
-    payment_type_kind: Optional[str] = Field(None, alias='paymentTypeKind')
-    terminal_groups: List[TerminalGroupItemModel] = Field(alias='terminalGroups')
+    is_deleted: bool = Field(alias="isDeleted")
+    print_cheque: bool = Field(alias="printCheque")
+    payment_processing_type: Optional[str] = Field(None, alias="paymentProcessingType")
+    payment_type_kind: Optional[str] = Field(None, alias="paymentTypeKind")
+    terminal_groups: List[TerminalGroupItemModel] = Field(alias="terminalGroups")
 
 
 class BasePaymentTypesModel(BaseResponseModel):
-    payment_types: List[PaymentTypeModel] = Field(alias='paymentTypes')
+    payment_types: List[PaymentTypeModel] = Field(alias="paymentTypes")
 
     def __list_id__(self):
         return [pt.id for pt in self.payment_types]
@@ -1010,7 +1023,7 @@ class RemovalTypeModel(IdNameModel):
     can_writeoff_to_user: bool = Field(alias="canWriteoffToUser")
     reason_required: bool = Field(alias="reasonRequired")
     manual: bool
-    is_deleted: bool = Field(alias='isDeleted')
+    is_deleted: bool = Field(alias="isDeleted")
 
 
 class BaseRemovalTypesModel(BaseResponseModel):
@@ -1113,9 +1126,9 @@ class BaseOrderByTableModel(BaseModel):
 
 class EIEmployeeModel(BaseModel):
     id: str
-    first_name: Optional[str] = Field(None, alias='firstName')
-    middle_name: Optional[str] = Field(None, alias='middleName')
-    last_name: Optional[str] = Field(None, alias='lastName')
+    first_name: Optional[str] = Field(None, alias="firstName")
+    middle_name: Optional[str] = Field(None, alias="middleName")
+    last_name: Optional[str] = Field(None, alias="lastName")
     email: Optional[str] = None
     phone: Optional[str] = None
     cell_phone: Optional[str] = Field(None, alias="cellPhone")
@@ -1126,18 +1139,18 @@ class BaseEInfoModel(BaseResponseModel):
 
 
 class TypeRCI(Enum):
-    phone = 'phone'
-    card_track = 'cardTrack'
-    card_number = 'cardNumber'
-    email = 'email'
-    id = 'id'
+    phone = "phone"
+    card_track = "cardTrack"
+    card_number = "cardNumber"
+    email = "email"
+    id = "id"
 
 
 class CardCIModel(BaseModel):
     id: str
     track: str
     number: str
-    valid_to_date: Optional[str] = Field(None, alias='validToDate')
+    valid_to_date: Optional[str] = Field(None, alias="validToDate")
 
 
 class CategoriesCIModel(IdNameModel):
@@ -1152,7 +1165,7 @@ class WalletBalanceCIModel(IdNameModel):
 
 class CustomerInfoModel(BaseModel):
     id: str
-    referrer_id: Optional[str] = Field(None, alias='referrerId')
+    referrer_id: Optional[str] = Field(None, alias="referrerId")
     name: Optional[str] = None
     surname: Optional[str] = None
     middle_name: Optional[str] = Field(None, alias="middleName")
@@ -1198,7 +1211,7 @@ class ItemsTerminalGroupStopListsResponse(BaseModel):
 
 
 class TerminalGroupStopListsResponse(BaseModel):
-    organization_id: str = Field(alias='organizationId')
+    organization_id: str = Field(alias="organizationId")
     items: Optional[List[ItemsTerminalGroupStopListsResponse]] = None
 
 
@@ -1221,7 +1234,6 @@ class WalletHoldResponse(BaseModel):
 
 
 # Models for WebHook
-from datetime import datetime
 
 
 class ErrorInfo(BaseModel):
@@ -1350,10 +1362,12 @@ class TerminalGroupStopListsEventInfoModel(BaseModel):
     id: Optional[str] = Field(None, alias="id")
     is_full: Optional[bool] = Field(None, alias="isFull")
 
+
 class EventInfoStopList(BaseModel):
     terminal_groups_stop_lists_updates: Optional[List[TerminalGroupStopListsEventInfoModel]] = Field(
         None, alias="terminalGroupsStopListsUpdates"
     )
+
 
 class EventInfo(BaseModel):
     id: str = Field("", alias="id")
@@ -1451,8 +1465,10 @@ class EventInfoPersonalShift(BaseModel):
 
 
 class WebHookDeliveryOrderEventInfoModel(BaseModel):
-    event_type: str = Field('', alias="eventType")
+    event_type: str = Field("", alias="eventType")
     event_time: Optional[datetime] = Field(None, alias="eventTime")
     organization_id: str = Field("", alias="organizationId")
     correlation_id: str = Field("", alias="correlationId")
-    event_info: Optional[Union[EventInfo, EventInfoStopList, EventInfoTableOrder, EventInfoReserve, EventInfoPersonalShift]] = Field(None, alias="eventInfo")
+    event_info: Optional[
+        Union[EventInfo, EventInfoStopList, EventInfoTableOrder, EventInfoReserve, EventInfoPersonalShift]
+    ] = Field(None, alias="eventInfo")

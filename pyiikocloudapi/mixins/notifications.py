@@ -1,15 +1,20 @@
-from typing import Union
-
 import httpx
 
 from pyiikocloudapi.base import BaseAPI
 from pyiikocloudapi.exception import PostException
-from pyiikocloudapi.models import BaseResponseModel, CustomErrorModel
+from pyiikocloudapi.models import BaseResponseModel
 
 
 class Notifications(BaseAPI):
-    def send(self, order_source: str, order_id: str, additional_info: str, organization_id: str,
-             message_type: str = "delivery_attention", timeout=BaseAPI.DEFAULT_TIMEOUT):
+    def send(
+        self,
+        order_source: str,
+        order_id: str,
+        additional_info: str,
+        organization_id: str,
+        message_type: str = "delivery_attention",
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
+    ):
         """
 
         :param order_source:
@@ -25,23 +30,16 @@ class Notifications(BaseAPI):
             "additionalInfo": additional_info,
             "messageType": message_type,
             "organizationId": organization_id,
-
         }
 
         try:
-
             return self._post_request(
-                url="/api/1/notifications/send",
-                data=data,
-                model_response_data=BaseResponseModel,
-                timeout=timeout
+                url="/api/1/notifications/send", data=data, model_response_data=BaseResponseModel, timeout=timeout
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.send.__name__,
-                                f"Не удалось отправить оповещение: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__, self.send.__name__, f"Не удалось отправить оповещение: \n{err}"
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.send.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(self.__class__.__qualname__, self.send.__name__, f"Не удалось: \n{err}")

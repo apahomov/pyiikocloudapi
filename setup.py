@@ -1,26 +1,25 @@
 from setuptools import setup
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
-VERSION = '0.0.30'
+VERSION = "0.0.30"
 setup(
-    name='pyiikocloudapi',
+    name="pyiikocloudapi",
     version=VERSION,
-    description='Python services for convenient work with iiko Transport / iiko cloud api',
+    description="Python services for convenient work with iiko Transport / iiko cloud api",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=['pyiikocloudapi', 'pyiikocloudapi.mixins', 'pyiikocloudapi.async_mixins'],
+    packages=["pyiikocloudapi", "pyiikocloudapi.mixins", "pyiikocloudapi.async_mixins"],
     # packages=find_packages(where="src"),
     # package_dir={"": "src"},
-    author='kebrick',
-    author_email='ruban.kebr@gmail.com',
-    license='MIT',
+    author="kebrick",
+    author_email="ruban.kebr@gmail.com",
+    license="MIT",
     project_urls={
-        'Source': 'https://github.com/kebrick/pyiikocloupapi',
-        'Tracker': 'https://github.com/kebrick/pyiikocloupapi/issues',
+        "Source": "https://github.com/kebrick/pyiikocloupapi",
+        "Tracker": "https://github.com/kebrick/pyiikocloupapi/issues",
     },
-    install_requires=['httpx>=0.24.0', 'pydantic>=2.0'],
-
-    python_requires='>=3.8',
-    zip_safe=False
+    install_requires=["httpx>=0.24.0", "pydantic>=2.0"],
+    python_requires=">=3.8",
+    zip_safe=False,
 )

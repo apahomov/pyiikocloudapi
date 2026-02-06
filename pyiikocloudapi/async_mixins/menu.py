@@ -5,21 +5,21 @@ import httpx
 from pyiikocloudapi.async_base import AsyncBaseAPI
 from pyiikocloudapi.exception import TokenException
 from pyiikocloudapi.models import (
-    CustomErrorModel,
-    BaseNomenclatureModel,
-    BaseMenuModel,
-    BaseMenuByIdModel,
-    StopListsResponse,
-    CheckStopListsResponse,
-    BaseComboModel,
     BaseComboCalculateModel,
+    BaseComboModel,
+    BaseMenuByIdModel,
+    BaseMenuModel,
+    BaseNomenclatureModel,
+    CheckStopListsResponse,
+    CustomErrorModel,
+    StopListsResponse,
 )
 
 
 class AsyncMenu(AsyncBaseAPI):
-    async def nomenclature(self, organization_id: str, start_revision: int = None,
-                           timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel, BaseNomenclatureModel]:
+    async def nomenclature(
+        self, organization_id: str, start_revision: int = None, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
+    ) -> Union[CustomErrorModel, BaseNomenclatureModel]:
         data = {
             "organizationId": organization_id,
         }
@@ -27,42 +27,41 @@ class AsyncMenu(AsyncBaseAPI):
             data["startRevision"] = start_revision
 
         try:
-
             return await self._post_request(
-                url="/api/1/nomenclature",
-                data=data,
-                model_response_data=BaseNomenclatureModel,
-                timeout=timeout
+                url="/api/1/nomenclature", data=data, model_response_data=BaseNomenclatureModel, timeout=timeout
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.nomenclature.__name__,
-                                 f"Не удалось получить номенклатуру: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.nomenclature.__name__, f"Не удалось получить номенклатуру: \n{err}"
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.nomenclature.__name__,
-                            f"Не удалось получить номенклатуру: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__, self.nomenclature.__name__, f"Не удалось получить номенклатуру: \n{err}"
+            )
 
     async def menu(self, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[CustomErrorModel, BaseMenuModel]:
         try:
-
-            return await self._post_request(
-                url="/api/2/menu",
-                model_response_data=BaseMenuModel,
-                timeout=timeout
-            )
+            return await self._post_request(url="/api/2/menu", model_response_data=BaseMenuModel, timeout=timeout)
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.menu.__name__,
-                                 f"Не удалось получить внешние меню с ценовыми категориями: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.menu.__name__,
+                f"Не удалось получить внешние меню с ценовыми категориями: \n{err}",
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.menu.__name__,
-                            f"Не удалось получить внешние меню с ценовыми категориями: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__,
+                self.menu.__name__,
+                f"Не удалось получить внешние меню с ценовыми категориями: \n{err}",
+            )
 
-    async def menu_by_id(self, external_menu_id: str, organization_ids: List[str], price_category_id: str = None,
-                         timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel, BaseMenuByIdModel]:
+    async def menu_by_id(
+        self,
+        external_menu_id: str,
+        organization_ids: List[str],
+        price_category_id: str = None,
+        timeout=AsyncBaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[CustomErrorModel, BaseMenuByIdModel]:
 
         data = {
             "externalMenuId": external_menu_id,
@@ -73,26 +72,29 @@ class AsyncMenu(AsyncBaseAPI):
             data["priceCategoryId"] = price_category_id
 
         try:
-
             return await self._post_request(
-                url="/api/2/menu/by_id",
-                data=data,
-                model_response_data=BaseMenuByIdModel,
-                timeout=timeout
+                url="/api/2/menu/by_id", data=data, model_response_data=BaseMenuByIdModel, timeout=timeout
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.menu_by_id.__name__,
-                                 f"Не удалось получить внешнее меню по ID.: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.menu_by_id.__name__,
+                f"Не удалось получить внешнее меню по ID.: \n{err}",
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.menu_by_id.__name__,
-                            f"Не удалось получить внешнее меню по ID.: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__,
+                self.menu_by_id.__name__,
+                f"Не удалось получить внешнее меню по ID.: \n{err}",
+            )
 
-    async def stop_lists(self, organization_ids: List[str], return_size: bool = False,
-                         terminal_groups_ids: List[str] = None,
-                         timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel, StopListsResponse]:
+    async def stop_lists(
+        self,
+        organization_ids: List[str],
+        return_size: bool = False,
+        terminal_groups_ids: List[str] = None,
+        timeout=AsyncBaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[CustomErrorModel, StopListsResponse]:
 
         data = {
             "organizationIds": organization_ids,
@@ -103,77 +105,68 @@ class AsyncMenu(AsyncBaseAPI):
             data["terminalGroupsIds"] = terminal_groups_ids
 
         try:
-
             return await self._post_request(
-                url="/api/1/stop_lists",
-                data=data,
-                model_response_data=StopListsResponse,
-                timeout=timeout
+                url="/api/1/stop_lists", data=data, model_response_data=StopListsResponse, timeout=timeout
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.stop_lists.__name__,
-                                 f"Не удалось получить товары, которых нет в наличии: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.stop_lists.__name__,
+                f"Не удалось получить товары, которых нет в наличии: \n{err}",
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.stop_lists.__name__,
-                            f"Не удалось получить товары, которых нет в наличии: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__,
+                self.stop_lists.__name__,
+                f"Не удалось получить товары, которых нет в наличии: \n{err}",
+            )
 
-    async def stop_lists_check(self, organization_id: str, terminal_group_id: str,
-                               items: dict,
-                               timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel, CheckStopListsResponse]:
+    async def stop_lists_check(
+        self, organization_id: str, terminal_group_id: str, items: dict, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
+    ) -> Union[CustomErrorModel, CheckStopListsResponse]:
         """"""
 
-        data = {
-            "organizationId": organization_id,
-            "terminalGroupId": terminal_group_id,
-            "items": items
-        }
+        data = {"organizationId": organization_id, "terminalGroupId": terminal_group_id, "items": items}
 
         try:
-
             return await self._post_request(
-                url="/api/1/stop_lists/check",
-                data=data,
-                model_response_data=CheckStopListsResponse,
-                timeout=timeout
+                url="/api/1/stop_lists/check", data=data, model_response_data=CheckStopListsResponse, timeout=timeout
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.stop_lists_check.__name__,
-                                 f"Не удалось проверить товары в списке отсутствующих на складе.: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.stop_lists_check.__name__,
+                f"Не удалось проверить товары в списке отсутствующих на складе.: \n{err}",
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.stop_lists_check.__name__,
-                            f"Не удалось проверить товары в списке отсутствующих на складе.: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__,
+                self.stop_lists_check.__name__,
+                f"Не удалось проверить товары в списке отсутствующих на складе.: \n{err}",
+            )
 
-    async def combo(self, organization_id: str, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel, BaseComboModel]:
+    async def combo(
+        self, organization_id: str, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
+    ) -> Union[CustomErrorModel, BaseComboModel]:
 
         data = {
             "organizationId": organization_id,
         }
 
         try:
-
             return await self._post_request(
-                url="/api/1/combo",
-                data=data,
-                model_response_data=BaseComboModel,
-                timeout=timeout
+                url="/api/1/combo", data=data, model_response_data=BaseComboModel, timeout=timeout
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.combo.__name__,
-                                 f"Не удалось получить комбо: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.combo.__name__, f"Не удалось получить комбо: \n{err}"
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.combo.__name__,
-                            f"Не удалось получить комбо: \n{err}")
+            raise TypeError(self.__class__.__qualname__, self.combo.__name__, f"Не удалось получить комбо: \n{err}")
 
-    async def combo_calculate(self, organization_id: str, items: dict, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel, BaseComboCalculateModel]:
+    async def combo_calculate(
+        self, organization_id: str, items: dict, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
+    ) -> Union[CustomErrorModel, BaseComboCalculateModel]:
 
         data = {
             "items": items,
@@ -181,18 +174,14 @@ class AsyncMenu(AsyncBaseAPI):
         }
 
         try:
-
             return await self._post_request(
-                url="/api/1/combo/calculate",
-                data=data,
-                model_response_data=BaseComboCalculateModel,
-                timeout=timeout
+                url="/api/1/combo/calculate", data=data, model_response_data=BaseComboCalculateModel, timeout=timeout
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.combo_calculate.__name__,
-                                 f"Не удалось получить расчёт комбо: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.combo_calculate.__name__, f"Не удалось получить расчёт комбо: \n{err}"
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.combo_calculate.__name__,
-                            f"Не удалось получить расчёт комбо: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__, self.combo_calculate.__name__, f"Не удалось получить расчёт комбо: \n{err}"
+            )

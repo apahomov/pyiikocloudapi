@@ -1,22 +1,23 @@
-from typing import Optional, List, Union
+from typing import Optional, Union
 
 import httpx
 
 from pyiikocloudapi.base import BaseAPI
 from pyiikocloudapi.exception import PostException
 from pyiikocloudapi.models import (
-    CustomerInfoModel,
     CustomerCreateOrUpdateModel,
+    CustomerInfoModel,
     CustomerProgramAddResponse,
-    WalletHoldResponse,
-    TypeRCI,
     CustomErrorModel,
+    TypeRCI,
+    WalletHoldResponse,
 )
 
 
 class Customers(BaseAPI):
-    def customer_info(self, organization_id: str, identifier: str, type: str, timeout=BaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomerInfoModel, CustomErrorModel]:
+    def customer_info(
+        self, organization_id: str, identifier: str, type: str, timeout=BaseAPI.DEFAULT_TIMEOUT
+    ) -> Union[CustomerInfoModel, CustomErrorModel]:
         """
 
         :param organization_id:
@@ -44,17 +45,17 @@ class Customers(BaseAPI):
                 url="/api/1/loyalty/iiko/customer/info",
                 data=data,
                 model_response_data=CustomerInfoModel,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_info.__name__,
-                                f"Не удалось получить информацию о клиенте: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_info.__name__,
+                f"Не удалось получить информацию о клиенте: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_info.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(self.__class__.__qualname__, self.customer_info.__name__, f"Не удалось: \n{err}")
 
     def customer_create_or_update(
         self,
@@ -73,63 +74,62 @@ class Customers(BaseAPI):
         referrer_id: Optional[str] = None,
         user_data: Optional[str] = None,
         id: str = None,
-        timeout=BaseAPI.DEFAULT_TIMEOUT):
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
+    ):
 
         data = {
             "organizationId": organization_id,
         }
         if id is not None:
-            data['id'] = id
+            data["id"] = id
         if phone is not None:
-            data['phone'] = phone
+            data["phone"] = phone
         if card_track is not None:
-            data['cardTrack'] = card_track
+            data["cardTrack"] = card_track
         if card_number is not None:
-            data['cardNumber'] = card_number
+            data["cardNumber"] = card_number
         if name is not None:
-            data['name'] = name
+            data["name"] = name
         if middle_name is not None:
-            data['middleName'] = middle_name
+            data["middleName"] = middle_name
         if sur_name is not None:
-            data['surName'] = sur_name
+            data["surName"] = sur_name
         if birthday is not None:
-            data['birthday'] = birthday
+            data["birthday"] = birthday
         if email is not None:
-            data['email'] = email
+            data["email"] = email
         if sex is not None:
-            data['sex'] = sex
+            data["sex"] = sex
         if consent_status is not None:
-            data['consentStatus'] = consent_status
+            data["consentStatus"] = consent_status
         if should_receive_promo_actions_info is not None:
-            data['shouldReceivePromoActionsInfo'] = should_receive_promo_actions_info
+            data["shouldReceivePromoActionsInfo"] = should_receive_promo_actions_info
         if referrer_id is not None:
-            data['referrerId'] = referrer_id
+            data["referrerId"] = referrer_id
         if user_data is not None:
-            data['userData'] = user_data
+            data["userData"] = user_data
 
         try:
             return self._post_request(
                 url="/api/1/loyalty/iiko/customer/create_or_update",
                 data=data,
                 model_response_data=CustomerCreateOrUpdateModel,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_create_or_update.__name__,
-                                f"Не удалось создать или обновить клиента: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_create_or_update.__name__,
+                f"Не удалось создать или обновить клиента: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_create_or_update.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__, self.customer_create_or_update.__name__, f"Не удалось: \n{err}"
+            )
 
     def customer_program_add(
-        self,
-        customer_id: str,
-        program_id: str,
-        organization_id: str,
-        timeout=BaseAPI.DEFAULT_TIMEOUT
+        self, customer_id: str, program_id: str, organization_id: str, timeout=BaseAPI.DEFAULT_TIMEOUT
     ):
 
         data = {
@@ -142,25 +142,20 @@ class Customers(BaseAPI):
                 url="/api/1/loyalty/iiko/customer/program/add",
                 data=data,
                 model_response_data=CustomerProgramAddResponse,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_program_add.__name__,
-                                f"Не удалось подключить клиента к программе: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_program_add.__name__,
+                f"Не удалось подключить клиента к программе: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_program_add.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(self.__class__.__qualname__, self.customer_program_add.__name__, f"Не удалось: \n{err}")
 
     def customer_card_add(
-        self,
-        customer_id: str,
-        card_track: str,
-        card_number,
-        organization_id: str,
-        timeout=BaseAPI.DEFAULT_TIMEOUT
+        self, customer_id: str, card_track: str, card_number, organization_id: str, timeout=BaseAPI.DEFAULT_TIMEOUT
     ):
 
         data = {
@@ -171,27 +166,20 @@ class Customers(BaseAPI):
         }
         try:
             return self._post_request(
-                url="/api/1/loyalty/iiko/customer/card/add",
-                data=data,
-                model_response_data=None,
-                timeout=timeout
+                url="/api/1/loyalty/iiko/customer/card/add", data=data, model_response_data=None, timeout=timeout
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_card_add.__name__,
-                                f"Не удалось подключить карту клиенту: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_card_add.__name__,
+                f"Не удалось подключить карту клиенту: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_card_add.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(self.__class__.__qualname__, self.customer_card_add.__name__, f"Не удалось: \n{err}")
 
     def customer_card_delete(
-        self,
-        customer_id: str,
-        card_track: str,
-        organization_id: str,
-        timeout=BaseAPI.DEFAULT_TIMEOUT
+        self, customer_id: str, card_track: str, organization_id: str, timeout=BaseAPI.DEFAULT_TIMEOUT
     ):
 
         data = {
@@ -201,20 +189,17 @@ class Customers(BaseAPI):
         }
         try:
             return self._post_request(
-                url="/api/1/loyalty/iiko/customer/card/remove",
-                data=data,
-                model_response_data=None,
-                timeout=timeout
+                url="/api/1/loyalty/iiko/customer/card/remove", data=data, model_response_data=None, timeout=timeout
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_card_delete.__name__,
-                                f"Не удалось подключить карту клиенту: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_card_delete.__name__,
+                f"Не удалось подключить карту клиенту: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_card_delete.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(self.__class__.__qualname__, self.customer_card_delete.__name__, f"Не удалось: \n{err}")
 
     def customer_wallet_hold(
         self,
@@ -224,7 +209,7 @@ class Customers(BaseAPI):
         organization_id: str,
         transaction_id: Optional[str] = None,
         comment: Optional[str] = None,
-        timeout=BaseAPI.DEFAULT_TIMEOUT
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
     ):
 
         data = {
@@ -243,24 +228,19 @@ class Customers(BaseAPI):
                 url="/api/1/loyalty/iiko/customer/wallet/hold",
                 data=data,
                 model_response_data=WalletHoldResponse,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_wallet_hold.__name__,
-                                f"Не удалось подключить карту клиенту: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_wallet_hold.__name__,
+                f"Не удалось подключить карту клиенту: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_wallet_hold.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(self.__class__.__qualname__, self.customer_wallet_hold.__name__, f"Не удалось: \n{err}")
 
-    def customer_wallet_cancel_hold(
-        self,
-        organization_id: str,
-        transaction_id: str,
-        timeout=BaseAPI.DEFAULT_TIMEOUT
-    ):
+    def customer_wallet_cancel_hold(self, organization_id: str, transaction_id: str, timeout=BaseAPI.DEFAULT_TIMEOUT):
 
         data = {
             "organizationId": organization_id,
@@ -272,17 +252,19 @@ class Customers(BaseAPI):
                 url="/api/1/loyalty/iiko/customer/wallet/cancel_hold",
                 data=data,
                 model_response_data=None,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_wallet_cancel_hold.__name__,
-                                f"Не удалось подключить карту клиенту: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_wallet_cancel_hold.__name__,
+                f"Не удалось подключить карту клиенту: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_wallet_cancel_hold.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__, self.customer_wallet_cancel_hold.__name__, f"Не удалось: \n{err}"
+            )
 
     def customer_wallet_topup(
         self,
@@ -291,7 +273,7 @@ class Customers(BaseAPI):
         sum: Union[int, float],
         organization_id: str,
         comment: Optional[str] = None,
-        timeout=BaseAPI.DEFAULT_TIMEOUT
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
     ):
         """
         Refill balance.
@@ -315,20 +297,19 @@ class Customers(BaseAPI):
             data["comment"] = comment
         try:
             return self._post_request(
-                url="/api/1/loyalty/iiko/customer/wallet/topup",
-                data=data,
-                model_response_data=None,
-                timeout=timeout
+                url="/api/1/loyalty/iiko/customer/wallet/topup", data=data, model_response_data=None, timeout=timeout
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_wallet_topup.__name__,
-                                f"Не удалось подключить карту клиенту: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_wallet_topup.__name__,
+                f"Не удалось подключить карту клиенту: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_wallet_topup.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__, self.customer_wallet_topup.__name__, f"Не удалось: \n{err}"
+            )
 
     def customer_wallet_chargeoff(
         self,
@@ -337,7 +318,7 @@ class Customers(BaseAPI):
         sum: Union[int, float],
         organization_id: str,
         comment: Optional[str] = None,
-        timeout=BaseAPI.DEFAULT_TIMEOUT
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
     ):
         """
         Withdraw balance.
@@ -364,14 +345,16 @@ class Customers(BaseAPI):
                 url="/api/1/loyalty/iiko/customer/wallet/chargeoff",
                 data=data,
                 model_response_data=None,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_wallet_chargeoff.__name__,
-                                f"Не удалось подключить карту клиенту: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__,
+                self.customer_wallet_chargeoff.__name__,
+                f"Не удалось подключить карту клиенту: \n{err}",
+            )
         except TypeError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.customer_wallet_chargeoff.__name__,
-                                f"Не удалось: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__, self.customer_wallet_chargeoff.__name__, f"Не удалось: \n{err}"
+            )

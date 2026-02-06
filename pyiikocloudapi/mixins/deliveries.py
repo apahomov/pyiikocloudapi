@@ -1,25 +1,30 @@
 import uuid
 from datetime import datetime
-from typing import Optional, List, Union
+from typing import List, Optional, Union
 
 import httpx
 
 from pyiikocloudapi.base import BaseAPI
 from pyiikocloudapi.decorators import experimental
-from pyiikocloudapi.exception import TokenException, PostException
+from pyiikocloudapi.exception import PostException, TokenException
 from pyiikocloudapi.models import (
-    CustomErrorModel,
     BaseCreatedDeliveryOrderInfoModel,
     BaseResponseModel,
-    ByDeliveryDateAndStatusModel,
     ByDeliveryDateAndSourceKeyAndFilter,
+    ByDeliveryDateAndStatusModel,
+    CustomErrorModel,
 )
 
 
 class Deliveries(BaseAPI):
-    def delivery_create(self, organization_id: str, order: dict, terminal_group_id: str = None,
-                        create_order_settings: Optional[int] = None, timeout=BaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel, BaseCreatedDeliveryOrderInfoModel]:
+    def delivery_create(
+        self,
+        organization_id: str,
+        order: dict,
+        terminal_group_id: str = None,
+        create_order_settings: Optional[int] = None,
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[CustomErrorModel, BaseCreatedDeliveryOrderInfoModel]:
         """"""
         data = {
             "organizationId": organization_id,
@@ -32,28 +37,29 @@ class Deliveries(BaseAPI):
             data["createOrderSettings"] = {"transportToFrontTimeout": create_order_settings}
 
         try:
-
             return self._post_request(
                 url="/api/1/deliveries/create",
                 data=data,
                 model_response_data=BaseCreatedDeliveryOrderInfoModel,
-                timeout=timeout
+                timeout=timeout,
             )
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.delivery_create.__name__,
-                                f"Не удалось создать заказ из за: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__, self.delivery_create.__name__, f"Не удалось создать заказ из за: \n{err}"
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.delivery_create.__name__,
-                            f"Не удалось создать заказ из за: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__, self.delivery_create.__name__, f"Не удалось создать заказ из за: \n{err}"
+            )
 
-    def update_order_delivery_status(self,
-                                     organization_id: str,
-                                     order_id: str,
-                                     delivery_status: str = "Delivered",
-                                     delivery_date: datetime = None, timeout=BaseAPI.DEFAULT_TIMEOUT
-                                     ):
+    def update_order_delivery_status(
+        self,
+        organization_id: str,
+        order_id: str,
+        delivery_status: str = "Delivered",
+        delivery_date: datetime = None,
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
+    ):
         """
         :param organization_id: Organization ID
         :param order_id: Order ID.
@@ -75,26 +81,24 @@ class Deliveries(BaseAPI):
         if delivery_status == "Delivered":
             data["deliveryDate"] = delivery_date.strftime(self.strfdt)
         try:
-
             return self._post_request(
                 url="/api/1/deliveries/update_order_delivery_status",
                 data=data,
                 model_response_data=BaseResponseModel,
-                timeout=timeout
+                timeout=timeout,
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.update_order_delivery_status.__name__,
-                                 f"Не удалось изменить статус: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.update_order_delivery_status.__name__,
+                f"Не удалось изменить статус: \n{err}",
+            )
         except TypeError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.update_order_delivery_status.__name__,
-                                 f"Не удалось: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.update_order_delivery_status.__name__, f"Не удалось: \n{err}"
+            )
 
-    def confirm(self,
-                organization_id: List[str],
-                order_id: str, timeout=BaseAPI.DEFAULT_TIMEOUT
-                ):
+    def confirm(self, organization_id: List[str], order_id: str, timeout=BaseAPI.DEFAULT_TIMEOUT):
         """
         Подвердить статус доставки заказа
 
@@ -110,25 +114,17 @@ class Deliveries(BaseAPI):
 
         try:
             return self._post_request(
-                url="/api/1/deliveries/confirm",
-                data=data,
-                model_response_data=BaseResponseModel,
-                timeout=timeout
+                url="/api/1/deliveries/confirm", data=data, model_response_data=BaseResponseModel, timeout=timeout
             )
 
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.confirm.__name__,
-                                 f"Не удалось изменить статус: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.confirm.__name__, f"Не удалось изменить статус: \n{err}"
+            )
         except TypeError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.confirm.__name__,
-                                 f"Не удалось: \n{err}")
+            raise TokenException(self.__class__.__qualname__, self.confirm.__name__, f"Не удалось: \n{err}")
 
-    def cancel_confirmation(self,
-                            organization_id: List[str],
-                            order_id: str, timeout=BaseAPI.DEFAULT_TIMEOUT
-                            ):
+    def cancel_confirmation(self, organization_id: List[str], order_id: str, timeout=BaseAPI.DEFAULT_TIMEOUT):
         """
         Отменить подтверждение доставки
 
@@ -143,30 +139,29 @@ class Deliveries(BaseAPI):
         }
 
         try:
-
             return self._post_request(
                 url="/api/1/deliveries/cancel_confirmation",
                 data=data,
                 model_response_data=BaseResponseModel,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.cancel_confirmation.__name__,
-                                 f"Не удалось изменить статус: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.cancel_confirmation.__name__, f"Не удалось изменить статус: \n{err}"
+            )
         except TypeError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.cancel_confirmation.__name__,
-                                 f"Не удалось: \n{err}")
+            raise TokenException(self.__class__.__qualname__, self.cancel_confirmation.__name__, f"Не удалось: \n{err}")
 
-    def by_delivery_date_and_status(self,
-                                    organization_id: List[str],
-                                    delivery_date_from: Union[datetime, str],
-                                    delivery_date_to: Union[datetime, str] = None,
-                                    statuses: list = None,
-                                    source_keys: list = None, timeout=BaseAPI.DEFAULT_TIMEOUT
-                                    ) -> Union[ByDeliveryDateAndStatusModel, CustomErrorModel]:
+    def by_delivery_date_and_status(
+        self,
+        organization_id: List[str],
+        delivery_date_from: Union[datetime, str],
+        delivery_date_to: Union[datetime, str] = None,
+        statuses: list = None,
+        source_keys: list = None,
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[ByDeliveryDateAndStatusModel, CustomErrorModel]:
         """
 
 
@@ -220,17 +215,19 @@ class Deliveries(BaseAPI):
                 url="/api/1/deliveries/by_delivery_date_and_status",
                 data=data,
                 model_response_data=ByDeliveryDateAndStatusModel,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.by_delivery_date_and_status.__name__,
-                                 f"Не удалось получить заказы: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.by_delivery_date_and_status.__name__,
+                f"Не удалось получить заказы: \n{err}",
+            )
         except TypeError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.by_delivery_date_and_status.__name__,
-                                 f"Не удалось: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.by_delivery_date_and_status.__name__, f"Не удалось: \n{err}"
+            )
 
     @experimental("будет дописан в будущем!")
     def by_revision(self, timeout=BaseAPI.DEFAULT_TIMEOUT):
@@ -244,24 +241,25 @@ class Deliveries(BaseAPI):
         # https://api-ru.iiko.services/api/1/deliveries/by_delivery_date_and_phone
         pass
 
-    def by_delivery_date_and_source_key_and_filter(self,
-                                                   organization_id: List[str],
-                                                   terminal_group_ids: Optional[List[Union[str, uuid.UUID]]] = None,
-                                                   delivery_date_from: Optional[str] = None,
-                                                   delivery_date_to: Optional[str] = None,
-                                                   statuses: Optional[List[str]] = None,
-                                                   has_problem: Optional[bool] = None,
-                                                   order_service_type: Optional[str] = None,
-                                                   search_text: Optional[str] = None,
-                                                   time_to_cooking_error_timeout: Optional[int] = None,
-                                                   cooking_timeout: Optional[int] = None,
-                                                   sort_property: Optional[str] = None,
-                                                   sort_direction: Optional[str] = None,
-                                                   rows_count: Optional[int] = None,
-                                                   source_keys: Optional[List[str]] = None,
-                                                   order_ids: Optional[List[Union[str, uuid.UUID]]] = None,
-                                                   timeout=BaseAPI.DEFAULT_TIMEOUT
-                                                   ) -> Union[ByDeliveryDateAndSourceKeyAndFilter, CustomErrorModel]:
+    def by_delivery_date_and_source_key_and_filter(
+        self,
+        organization_id: List[str],
+        terminal_group_ids: Optional[List[Union[str, uuid.UUID]]] = None,
+        delivery_date_from: Optional[str] = None,
+        delivery_date_to: Optional[str] = None,
+        statuses: Optional[List[str]] = None,
+        has_problem: Optional[bool] = None,
+        order_service_type: Optional[str] = None,
+        search_text: Optional[str] = None,
+        time_to_cooking_error_timeout: Optional[int] = None,
+        cooking_timeout: Optional[int] = None,
+        sort_property: Optional[str] = None,
+        sort_direction: Optional[str] = None,
+        rows_count: Optional[int] = None,
+        source_keys: Optional[List[str]] = None,
+        order_ids: Optional[List[Union[str, uuid.UUID]]] = None,
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[ByDeliveryDateAndSourceKeyAndFilter, CustomErrorModel]:
         """
 
         :param organization_id: List
@@ -362,14 +360,18 @@ class Deliveries(BaseAPI):
                 url="/api/1/deliveries/by_delivery_date_and_source_key_and_filter",
                 data=data,
                 model_response_data=ByDeliveryDateAndSourceKeyAndFilter,
-                timeout=timeout
+                timeout=timeout,
             )
 
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.by_delivery_date_and_source_key_and_filter.__name__,
-                                 f"Не удалось получить заказы: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.by_delivery_date_and_source_key_and_filter.__name__,
+                f"Не удалось получить заказы: \n{err}",
+            )
         except TypeError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.by_delivery_date_and_source_key_and_filter.__name__,
-                                 f"Не удалось: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.by_delivery_date_and_source_key_and_filter.__name__,
+                f"Не удалось: \n{err}",
+            )

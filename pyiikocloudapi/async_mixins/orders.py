@@ -3,19 +3,23 @@ from typing import List, Optional, Union
 import httpx
 
 from pyiikocloudapi.async_base import AsyncBaseAPI
-from pyiikocloudapi.exception import TokenException, PostException
+from pyiikocloudapi.exception import PostException, TokenException
 from pyiikocloudapi.models import (
-    CustomErrorModel,
     BaseCreatedOrderInfoModel,
     ByIdModel,
+    CustomErrorModel,
 )
 
 
 class AsyncOrders(AsyncBaseAPI):
-    async def order_create(self, organization_id: str, terminal_group_id: str, order: dict,
-                           create_order_settings: Optional[int] = None, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel,
-        BaseCreatedOrderInfoModel]:
+    async def order_create(
+        self,
+        organization_id: str,
+        terminal_group_id: str,
+        order: dict,
+        create_order_settings: Optional[int] = None,
+        timeout=AsyncBaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[CustomErrorModel, BaseCreatedOrderInfoModel]:
         """"""
 
         data = {
@@ -27,30 +31,27 @@ class AsyncOrders(AsyncBaseAPI):
             data["createOrderSettings"] = create_order_settings
 
         try:
-
             return await self._post_request(
-                url="/api/1/order/create",
-                data=data,
-                model_response_data=BaseCreatedOrderInfoModel,
-                timeout=timeout
-
+                url="/api/1/order/create", data=data, model_response_data=BaseCreatedOrderInfoModel, timeout=timeout
             )
         except httpx.HTTPError as err:
-            raise PostException(self.__class__.__qualname__,
-                                self.order_create.__name__,
-                                f"Не удалось создать заказ из за: \n{err}")
+            raise PostException(
+                self.__class__.__qualname__, self.order_create.__name__, f"Не удалось создать заказ из за: \n{err}"
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.order_create.__name__,
-                            f"Не удалось создать заказ из за: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__, self.order_create.__name__, f"Не удалось создать заказ из за: \n{err}"
+            )
 
-    async def order_by_id(self,
-                          organization_ids: List[str],
-                          order_ids: List[str] = None,
-                          pos_order_ids: List[str] = None,
-                          return_external_data_keys: List[str] = None,
-                          source_keys: list = None, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
-                          ) -> Union[CustomErrorModel, ByIdModel]:
+    async def order_by_id(
+        self,
+        organization_ids: List[str],
+        order_ids: List[str] = None,
+        pos_order_ids: List[str] = None,
+        return_external_data_keys: List[str] = None,
+        source_keys: list = None,
+        timeout=AsyncBaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[CustomErrorModel, ByIdModel]:
         """
         Получить заказы по идентификаторам.
 
@@ -66,41 +67,37 @@ class AsyncOrders(AsyncBaseAPI):
             "organizationIds": organization_ids,
             "orderIds": order_ids,
         }
-        if (source_keys is not None):
+        if source_keys is not None:
             data["sourceKeys"] = source_keys
 
-        if (pos_order_ids is not None):
+        if pos_order_ids is not None:
             data["posOrderIds"] = pos_order_ids
 
-        if (return_external_data_keys is not None):
+        if return_external_data_keys is not None:
             data["returnExternalDataKeys"] = return_external_data_keys
 
         try:
-
             return await self._post_request(
-                url="/api/1/order/by_id",
-                data=data,
-                model_response_data=ByIdModel,
-                timeout=timeout
+                url="/api/1/order/by_id", data=data, model_response_data=ByIdModel, timeout=timeout
             )
 
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.order_by_id.__name__,
-                                 f"Не удалось получить заказы: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.order_by_id.__name__, f"Не удалось получить заказы: \n{err}"
+            )
         except TypeError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.order_by_id.__name__,
-                                 f"Не удалось: \n{err}")
+            raise TokenException(self.__class__.__qualname__, self.order_by_id.__name__, f"Не удалось: \n{err}")
 
-    async def order_by_table(self,
-                             organization_ids: List[str],
-                             table_ids: List[str],
-                             source_keys: List[str] = None,
-                             statuses: List[str] = None,
-                             date_from: str = None,
-                             date_to: str = None, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
-                             ) -> Union[CustomErrorModel, ByIdModel]:
+    async def order_by_table(
+        self,
+        organization_ids: List[str],
+        table_ids: List[str],
+        source_keys: List[str] = None,
+        statuses: List[str] = None,
+        date_from: str = None,
+        date_to: str = None,
+        timeout=AsyncBaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[CustomErrorModel, ByIdModel]:
         """
 
         :param organization_ids:
@@ -140,19 +137,13 @@ class AsyncOrders(AsyncBaseAPI):
             data["dateTo"] = date_to
 
         try:
-
             return await self._post_request(
-                url="/api/1/order/by_table",
-                data=data,
-                model_response_data=ByIdModel,
-                timeout=timeout
+                url="/api/1/order/by_table", data=data, model_response_data=ByIdModel, timeout=timeout
             )
 
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.order_by_table.__name__,
-                                 f"Не удалось получить заказы: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.order_by_table.__name__, f"Не удалось получить заказы: \n{err}"
+            )
         except TypeError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.order_by_table.__name__,
-                                 f"Не удалось: \n{err}")
+            raise TokenException(self.__class__.__qualname__, self.order_by_table.__name__, f"Не удалось: \n{err}")

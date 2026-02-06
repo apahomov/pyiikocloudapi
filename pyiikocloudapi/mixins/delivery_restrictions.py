@@ -3,47 +3,57 @@ from typing import List, Union
 import httpx
 
 from pyiikocloudapi.base import BaseAPI
-from pyiikocloudapi.exception import TokenException, ParamSetException
+from pyiikocloudapi.exception import ParamSetException, TokenException
 from pyiikocloudapi.models import (
     CustomErrorModel,
-    BaseRemovalTypesModel,
     DeliveryRestrictionsAllowedModel,
 )
 
 
 class DeliveryRestrictions(BaseAPI):
-    def delivery_restrictions(self, organization_ids: List[str], timeout=BaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel,]:
+    def delivery_restrictions(
+        self, organization_ids: List[str], timeout=BaseAPI.DEFAULT_TIMEOUT
+    ) -> Union[CustomErrorModel,]:
         if not bool(organization_ids):
-            raise ParamSetException(self.__class__.__qualname__,
-                                    self.delivery_restrictions.__name__,
-                                    f"Пустой список id организаций")
+            raise ParamSetException(
+                self.__class__.__qualname__, self.delivery_restrictions.__name__, "Пустой список id организаций"
+            )
         data = {
             "organizationIds": organization_ids,
         }
 
         try:
-
             return self._post_request(
                 url="/api/1/delivery_restrictions",
                 data=data,
-                timeout=timeout
+                timeout=timeout,
                 # model_response_data=BaseRemovalTypesModel
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.delivery_restrictions.__name__,
-                                 f"Не удалось получить список ограничений доставки: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.delivery_restrictions.__name__,
+                f"Не удалось получить список ограничений доставки: \n{err}",
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.delivery_restrictions.__name__,
-                            f"Не удалось получить список ограничений доставки: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__,
+                self.delivery_restrictions.__name__,
+                f"Не удалось получить список ограничений доставки: \n{err}",
+            )
 
-    def dr_allowed(self, organization_ids: List[str], is_courier_delivery: bool,
-                   delivery_address: dict = None, order_location: dict = None, order_items: dict = None,
-                   delivery_date: str = None, delivery_sum: float = None, discount_sum: float = None,
-                   timeout=BaseAPI.DEFAULT_TIMEOUT) -> Union[
-        CustomErrorModel, DeliveryRestrictionsAllowedModel]:
+    def dr_allowed(
+        self,
+        organization_ids: List[str],
+        is_courier_delivery: bool,
+        delivery_address: dict = None,
+        order_location: dict = None,
+        order_items: dict = None,
+        delivery_date: str = None,
+        delivery_sum: float = None,
+        discount_sum: float = None,
+        timeout=BaseAPI.DEFAULT_TIMEOUT,
+    ) -> Union[CustomErrorModel, DeliveryRestrictionsAllowedModel]:
         """
         Get suitable terminal groups for delivery restrictions.
         :param organization_ids:
@@ -58,9 +68,9 @@ class DeliveryRestrictions(BaseAPI):
         :return:
         """
         if not bool(organization_ids):
-            raise ParamSetException(self.__class__.__qualname__,
-                                    self.dr_allowed.__name__,
-                                    f"Пустой список id организаций")
+            raise ParamSetException(
+                self.__class__.__qualname__, self.dr_allowed.__name__, "Пустой список id организаций"
+            )
         data = {
             "organizationIds": organization_ids,
             "isCourierDelivery": is_courier_delivery,
@@ -78,18 +88,21 @@ class DeliveryRestrictions(BaseAPI):
         if discount_sum is not None:
             data["discountSum"] = discount_sum
         try:
-
             return self._post_request(
                 url="/api/1/delivery_restrictions/allowed",
                 data=data,
                 timeout=timeout,
-                model_response_data=DeliveryRestrictionsAllowedModel
+                model_response_data=DeliveryRestrictionsAllowedModel,
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.dr_allowed.__name__,
-                                 f"Не удалось получить подходящие группы терминалов для ограничения доставки: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__,
+                self.dr_allowed.__name__,
+                f"Не удалось получить подходящие группы терминалов для ограничения доставки: \n{err}",
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.dr_allowed.__name__,
-                            f"Не удалось получить подходящие группы терминалов для ограничения доставки: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__,
+                self.dr_allowed.__name__,
+                f"Не удалось получить подходящие группы терминалов для ограничения доставки: \n{err}",
+            )

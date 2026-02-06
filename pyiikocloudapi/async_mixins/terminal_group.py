@@ -3,18 +3,18 @@ from typing import List, Union
 import httpx
 
 from pyiikocloudapi.async_base import AsyncBaseAPI
-from pyiikocloudapi.exception import TokenException, ParamSetException
+from pyiikocloudapi.exception import ParamSetException, TokenException
 from pyiikocloudapi.models import (
-    CustomErrorModel,
     BaseTerminalGroupsModel,
     BaseTGIsAliveyModel,
+    CustomErrorModel,
 )
 
 
 class AsyncTerminalGroup(AsyncBaseAPI):
-    async def terminal_groups(self, organization_ids: List[str], include_disabled: bool = False,
-                              timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[CustomErrorModel,
-    BaseTerminalGroupsModel]:
+    async def terminal_groups(
+        self, organization_ids: List[str], include_disabled: bool = False, timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
+    ) -> Union[CustomErrorModel, BaseTerminalGroupsModel]:
         """
 
         :param organization_ids: 	Array of strings <uuid>, Organizations IDs for which information is requested.
@@ -22,34 +22,30 @@ class AsyncTerminalGroup(AsyncBaseAPI):
         :return:
         """
         if not bool(organization_ids):
-            raise ParamSetException(self.__class__.__qualname__,
-                                    self.terminal_groups.__name__,
-                                    f"Пустой список id организаций")
+            raise ParamSetException(
+                self.__class__.__qualname__, self.terminal_groups.__name__, "Пустой список id организаций"
+            )
         data = {
             "organizationIds": organization_ids,
         }
         if include_disabled:
             data["includeDisabled"] = include_disabled
         try:
-
             return await self._post_request(
-                url="/api/1/terminal_groups",
-                data=data,
-                model_response_data=BaseTerminalGroupsModel,
-                timeout=timeout
+                url="/api/1/terminal_groups", data=data, model_response_data=BaseTerminalGroupsModel, timeout=timeout
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.terminal_groups.__name__,
-                                 f"Не удалось получить регионы: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.terminal_groups.__name__, f"Не удалось получить регионы: \n{err}"
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.terminal_groups.__name__,
-                            f"Не удалось получить регионы: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__, self.terminal_groups.__name__, f"Не удалось получить регионы: \n{err}"
+            )
 
-    async def is_alive(self, organization_ids: List[str], terminal_group_ids: List[str],
-                       timeout=AsyncBaseAPI.DEFAULT_TIMEOUT) -> Union[CustomErrorModel,
-    BaseTGIsAliveyModel]:
+    async def is_alive(
+        self, organization_ids: List[str], terminal_group_ids: List[str], timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
+    ) -> Union[CustomErrorModel, BaseTGIsAliveyModel]:
         """
 
         :param terminal_group_ids:
@@ -57,27 +53,21 @@ class AsyncTerminalGroup(AsyncBaseAPI):
         :return:
         """
         if not bool(organization_ids):
-            raise ParamSetException(self.__class__.__qualname__,
-                                    self.is_alive.__name__,
-                                    f"Пустой список id организаций")
-        data = {
-            "organizationIds": organization_ids,
-            "terminalGroupIds": terminal_group_ids
-        }
+            raise ParamSetException(self.__class__.__qualname__, self.is_alive.__name__, "Пустой список id организаций")
+        data = {"organizationIds": organization_ids, "terminalGroupIds": terminal_group_ids}
 
         try:
-
             return await self._post_request(
                 url="/api/1/terminal_groups/is_alive",
                 data=data,
                 model_response_data=BaseTGIsAliveyModel,
-                timeout=timeout
+                timeout=timeout,
             )
         except httpx.HTTPError as err:
-            raise TokenException(self.__class__.__qualname__,
-                                 self.is_alive.__name__,
-                                 f"Не удалось получить регионы: \n{err}")
+            raise TokenException(
+                self.__class__.__qualname__, self.is_alive.__name__, f"Не удалось получить регионы: \n{err}"
+            )
         except TypeError as err:
-            raise TypeError(self.__class__.__qualname__,
-                            self.is_alive.__name__,
-                            f"Не удалось получить регионы: \n{err}")
+            raise TypeError(
+                self.__class__.__qualname__, self.is_alive.__name__, f"Не удалось получить регионы: \n{err}"
+            )
