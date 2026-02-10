@@ -5,6 +5,7 @@ import httpx
 from pyiikocloudapi.base import BaseAPI
 from pyiikocloudapi.exception import ParamSetException, TokenException
 from pyiikocloudapi.models import (
+    BaseDeliveryRestrictionsModel,
     CustomErrorModel,
     DeliveryRestrictionsAllowedModel,
 )
@@ -13,7 +14,7 @@ from pyiikocloudapi.models import (
 class DeliveryRestrictions(BaseAPI):
     def delivery_restrictions(
         self, organization_ids: List[str], timeout=BaseAPI.DEFAULT_TIMEOUT
-    ) -> Union[CustomErrorModel,]:
+    ) -> Union[CustomErrorModel, BaseDeliveryRestrictionsModel]:
         if not bool(organization_ids):
             raise ParamSetException(
                 self.__class__.__qualname__, self.delivery_restrictions.__name__, "Пустой список id организаций"
@@ -27,7 +28,7 @@ class DeliveryRestrictions(BaseAPI):
                 url="/api/1/delivery_restrictions",
                 data=data,
                 timeout=timeout,
-                # model_response_data=BaseRemovalTypesModel
+                model_response_data=BaseDeliveryRestrictionsModel,
             )
         except httpx.HTTPError as err:
             raise TokenException(

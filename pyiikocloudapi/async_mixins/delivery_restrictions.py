@@ -5,6 +5,7 @@ import httpx
 from pyiikocloudapi.async_base import AsyncBaseAPI
 from pyiikocloudapi.exception import ParamSetException, TokenException
 from pyiikocloudapi.models import (
+    BaseDeliveryRestrictionsModel,
     CustomErrorModel,
     DeliveryRestrictionsAllowedModel,
 )
@@ -13,7 +14,7 @@ from pyiikocloudapi.models import (
 class AsyncDeliveryRestrictions(AsyncBaseAPI):
     async def delivery_restrictions(
         self, organization_ids: List[str], timeout=AsyncBaseAPI.DEFAULT_TIMEOUT
-    ) -> Union[CustomErrorModel,]:
+    ) -> Union[CustomErrorModel, BaseDeliveryRestrictionsModel]:
         if not bool(organization_ids):
             raise ParamSetException(
                 self.__class__.__qualname__, self.delivery_restrictions.__name__, "Пустой список id организаций"
@@ -23,7 +24,12 @@ class AsyncDeliveryRestrictions(AsyncBaseAPI):
         }
 
         try:
-            return await self._post_request(url="/api/1/delivery_restrictions", data=data, timeout=timeout)
+            return await self._post_request(
+                url="/api/1/delivery_restrictions",
+                data=data,
+                timeout=timeout,
+                model_response_data=BaseDeliveryRestrictionsModel,
+            )
         except httpx.HTTPError as err:
             raise TokenException(
                 self.__class__.__qualname__,

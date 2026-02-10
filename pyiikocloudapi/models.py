@@ -777,8 +777,8 @@ class NPGroupModifierModel(BaseModel):
 class NProductModel(BaseModel):
     fat_amount: Optional[float] = Field(None, alias="fatAmount")
     proteins_amount: Optional[float] = Field(None, alias="proteinsAmount")
-    carbohydrates_amount: Optional[float] = Field(None, alias="energyAmount")
-    energy_amount: Optional[float] = Field(None, alias="carbohydratesAmount")
+    carbohydrates_amount: Optional[float] = Field(None, alias="carbohydratesAmount")
+    energy_amount: Optional[float] = Field(None, alias="energyAmount")
     fat_full_amount: Optional[float] = Field(None, alias="fatFullAmount")
     proteins_full_amount: Optional[float] = Field(None, alias="proteinsFullAmount")
     carbohydrates_full_amount: Optional[float] = Field(None, alias="carbohydratesFullAmount")
@@ -884,7 +884,7 @@ class MBIdICItemSizeModel(BaseModel):
     item_modifier_groups: List[MBIdICISItemModifierGroupModel] = Field(alias="itemModifierGroups")
     sku: str
     size_code: str = Field(alias="sizeCode")
-    size_name: str = Field(aliad="sizeName")
+    size_name: str = Field(alias="sizeName")
     is_default: Optional[bool] = Field(None, alias="isDefault")
     portion_weight_grams: float = Field(alias="portionWeightGrams")
     size_id: str = Field(alias="sizeId")
@@ -957,8 +957,8 @@ class DItemModel(IdNameModel):
     is_categorised_discount: bool = Field(alias="isCategorisedDiscount")
     product_category_discounts: List[DIProductCategoryDiscountsModel] = Field(alias="productCategoryDiscounts")
     comment: Optional[str] = None
-    can_be_applied_selectively: str = Field(alias="canBeAppliedSelectively")
-    min_order_sum: Optional[float] = Field(None, aliad="minOrderSum")
+    can_be_applied_selectively: bool = Field(alias="canBeAppliedSelectively")
+    min_order_sum: Optional[float] = Field(None, alias="minOrderSum")
     mode: str
     sum: float
     can_apply_by_card_number: bool = Field(alias="canApplyByCardNumber")
@@ -969,7 +969,7 @@ class DItemModel(IdNameModel):
 
 
 class DiscountModel(BaseModel):
-    organization_id: str
+    organization_id: str = Field(alias="organizationId")
     items: List[DItemModel]
 
 
@@ -1031,14 +1031,14 @@ class BaseRemovalTypesModel(BaseResponseModel):
 
 
 class Location(BaseModel):
-    latitude: int
-    longitude: int
+    latitude: float
+    longitude: float
 
 
 class AllowedItem(BaseModel):
-    terminal_group_id: str = Field(None, alias="terminalGroupId")
-    organization_id: str = Field(None, alias="organizationId")
-    delivery_duration_in_minutes: int = Field(None, alias="deliveryDurationInMinutes")
+    terminal_group_id: Optional[str] = Field(None, alias="terminalGroupId")
+    organization_id: Optional[str] = Field(None, alias="organizationId")
+    delivery_duration_in_minutes: Optional[int] = Field(None, alias="deliveryDurationInMinutes")
     zone: Optional[str] = None
     delivery_service_product_id: Optional[str] = Field(None, alias="deliveryServiceProductId")
 
@@ -1057,6 +1057,38 @@ class RejectedItem(BaseModel):
     reject_code: str = Field(alias="rejectCode")
     reject_hint: str = Field(alias="rejectHint")
     reject_item_data: Optional[RejectItemData] = Field(None, alias="rejectItemData")
+
+
+class DeliveryRestrictionItem(BaseModel):
+    organization_id: str = Field(alias="organizationId")
+    delivery_geocode_service_type: Optional[int] = Field(None, alias="deliveryGeocodeServiceType")
+    delivery_regions_map_url: Optional[str] = Field(None, alias="deliveryRegionsMapUrl")
+    default_delivery_duration_in_minutes: Optional[int] = Field(None, alias="defaultDeliveryDurationInMinutes")
+    default_self_service_duration_in_minutes: Optional[int] = Field(None, alias="defaultSelfServiceDurationInMinutes")
+    use_same_delivery_duration: Optional[bool] = Field(None, alias="useSameDeliveryDuration")
+    use_same_min_sum: Optional[bool] = Field(None, alias="useSameMinSum")
+    default_min_sum: Optional[float] = Field(None, alias="defaultMinSum")
+    use_same_work_time_interval: Optional[bool] = Field(None, alias="useSameWorkTimeInterval")
+    default_from: Optional[str] = Field(None, alias="defaultFrom")
+    default_to: Optional[str] = Field(None, alias="defaultTo")
+    use_same_restrictions_on_all_week: Optional[bool] = Field(None, alias="useSameRestrictionsOnAllWeek")
+    restrictions: Optional[List[dict]] = None
+    delivery_zones: Optional[List[dict]] = Field(None, alias="deliveryZones")
+    reject_on_geocoding_error: Optional[bool] = Field(None, alias="rejectOnGeocodingError")
+    add_delivery_service_cost: Optional[bool] = Field(None, alias="addDeliveryServiceCost")
+    use_same_delivery_service_product: Optional[bool] = Field(None, alias="useSameDeliveryServiceProduct")
+    default_delivery_service_product_id: Optional[str] = Field(None, alias="defaultDeliveryServiceProductId")
+    use_external_assignation_service: Optional[bool] = Field(None, alias="useExternalAssignationService")
+    front_trusts_call_center_check: Optional[bool] = Field(None, alias="frontTrustsCallCenterCheck")
+    external_assignation_service_url: Optional[str] = Field(None, alias="externalAssignationServiceUrl")
+    require_exact_address_for_geocoding: Optional[bool] = Field(None, alias="requireExactAddressForGeocoding")
+    zones_mode: Optional[int] = Field(None, alias="zonesMode")
+    auto_assign_external_deliveries: Optional[bool] = Field(None, alias="autoAssignExternalDeliveries")
+    action_on_validation_rejection: Optional[int] = Field(None, alias="actionOnValidationRejection")
+
+
+class BaseDeliveryRestrictionsModel(BaseResponseModel):
+    delivery_restrictions: List[DeliveryRestrictionItem] = Field(alias="deliveryRestrictions")
 
 
 class DeliveryRestrictionsAllowedModel(BaseModel):
